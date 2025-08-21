@@ -2,8 +2,9 @@
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System;
+using Gusty_Golbat.Setup;
 
-namespace Gusty_Golbat.Content
+namespace Gusty_Golbat.Geometria
 {
     public class CubeDrawer : Collider
     {
@@ -13,7 +14,7 @@ namespace Gusty_Golbat.Content
         private VertexBuffer vBuffer;
         private short[] indices;
         public Matrix world;
-        private Vector3 position, scale, rotation;
+        private Vector3 scale, rotation;
         private BasicEffect effect;
         private Texture2D texture;
 
@@ -26,13 +27,13 @@ namespace Gusty_Golbat.Content
             this.scale = scale;
             this.texture = texture;
 
-            this.world = Matrix.Identity;
-            this.world *= _base;
-            this.world *= Matrix.CreateScale(this.scale);
-            this.world *= Matrix.CreateRotationY(this.rotation.Y);
-            this.world *= Matrix.CreateTranslation(this.position);
+            world = Matrix.Identity;
+            world *= _base;
+            world *= Matrix.CreateScale(this.scale);
+            world *= Matrix.CreateRotationY(this.rotation.Y);
+            world *= Matrix.CreateTranslation(this.position);
 
-            this.effect = new BasicEffect(this.game.GraphicsDevice)
+            effect = new BasicEffect(this.game.GraphicsDevice)
             {
                 TextureEnabled = true,
                 Texture = texture
@@ -41,13 +42,13 @@ namespace Gusty_Golbat.Content
             CreateVertex();
             CreateVertexBuffer();
 
-            Vector3 colliderCenter = Vector3.Transform(CalculateColliderCenter(), this.world);
+            Vector3 colliderCenter = Vector3.Transform(CalculateColliderCenter(), world);
             Vector3 colliderDimension = CalculateColliderDimension() * scale;
 
-            this.SetPosition(colliderCenter);
-            this.dimension = colliderDimension;
-            this.UpdateBoundingBox();
-            this.lineBox = new LineBox(game, colliderCenter, colliderDimension, Color.Green);
+            SetPosition(colliderCenter);
+            dimension = colliderDimension;
+            UpdateBoundingBox();
+            lineBox = new LineBox(game, colliderCenter, colliderDimension, Color.Green);
         }
 
         private void CreateVertex()
@@ -110,25 +111,25 @@ namespace Gusty_Golbat.Content
 
         private void CreateVertexBuffer()
         {
-            this.vBuffer = new VertexBuffer(game.GraphicsDevice,
+            vBuffer = new VertexBuffer(game.GraphicsDevice,
                                             typeof(VertexPositionTexture),
                                             verts.Length,
                                             BufferUsage.None);
-            this.vBuffer.SetData<VertexPositionTexture>(verts);
+            vBuffer.SetData(verts);
         }
 
         public void UpdateMatrix(Matrix newWorld)
         {
-            this.world = newWorld;
+            world = newWorld;
         }
 
         public void Draw(Camera camera, Texture2D texture)
         {
             game.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            game.GraphicsDevice.SetVertexBuffer(this.vBuffer);
+            game.GraphicsDevice.SetVertexBuffer(vBuffer);
 
-            effect.World = this.world;
+            effect.World = world;
             effect.View = camera.GetView();
             effect.Projection = camera.GetProjection();
 
@@ -141,7 +142,7 @@ namespace Gusty_Golbat.Content
             {
                 pass.Apply();
 
-                game.GraphicsDevice.DrawUserPrimitives<VertexPositionTexture>(
+                game.GraphicsDevice.DrawUserPrimitives(
                     PrimitiveType.TriangleList,
                     verts,
                     0,
@@ -149,7 +150,7 @@ namespace Gusty_Golbat.Content
                 );
             }
 
-            DrawCollider(camera);  
+            DrawCollider(camera);
         }
 
         public void DrawCollider(Camera camera)
@@ -161,7 +162,7 @@ namespace Gusty_Golbat.Content
                 VertexColorEnabled = true
             };
 
-            base.Draw(effect);
+            Draw(effect);
         }
 
         private Vector3 CalculateColliderCenter()

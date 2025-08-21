@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusty_Golbat
+namespace Gusty_Golbat.Geometria
 {
     public class PlaneDrawer
     {
@@ -29,13 +29,14 @@ namespace Gusty_Golbat
             Matrix planeRotationX = Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X));
             Matrix planeRotationY = Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y));
             Matrix planeRotationZ = Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z));
+            
             Matrix planeFinalRotation = planeRotationX * planeRotationY * planeRotationZ;
 
             Matrix planeTranslation = Matrix.CreateTranslation(position);
 
 
             Matrix planeInitialTransform = planeScale * planeFinalRotation * planeTranslation;
-            this.SetWorld(planeInitialTransform);
+            SetWorld(planeInitialTransform);
         }
 
         public PlaneDrawer(GraphicsDevice graphicsDevice)

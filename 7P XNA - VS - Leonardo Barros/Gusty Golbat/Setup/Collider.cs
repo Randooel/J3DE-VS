@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Gusty_Golbat
+namespace Gusty_Golbat.Setup
 {
     public class Collider
     {
@@ -19,54 +19,54 @@ namespace Gusty_Golbat
             this.position = position;
             this.dimension = dimension;
 
-            this.UpdateBoundingBox();
+            UpdateBoundingBox();
 
             this.visible = visible;
-            this.lineBox = new LineBox(game, position, dimension, color);
+            lineBox = new LineBox(game, position, dimension, color);
         }
 
         protected void UpdateBoundingBox()
         {
-            this.bb = new BoundingBox(this.position - this.dimension / 2f,
-                                      this.position + this.dimension / 2f);
+            bb = new BoundingBox(position - dimension / 2f,
+                                      position + dimension / 2f);
         }
 
         public void Draw(BasicEffect e)
         {
-            if (this.visible)
-                this.lineBox.Draw(e);
+            if (visible)
+                lineBox.Draw(e);
         }
 
         public void SetPosition(Vector3 position)
         {
             this.position = position;
-            this.lineBox.SetPosition(this.position);
-            this.UpdateBoundingBox();
+            lineBox.SetPosition(this.position);
+            UpdateBoundingBox();
         }
 
         public BoundingBox GetBoundingBox()
         {
-            return this.bb;
+            return bb;
         }
 
         public bool IsColliding(BoundingBox box)
         {
-            return this.bb.Intersects(box);
+            return bb.Intersects(box);
         }
 
         public bool GetVisible()
         {
-            return this.visible;
+            return visible;
         }
 
         public void SetVisible(bool value)
         {
-            this.visible = value;
+            visible = value;
         }
 
         public LineBox GetLineBox()
         {
-            return this.lineBox;
+            return lineBox;
         }
     }
 }

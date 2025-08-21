@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusty_Golbat
+namespace Gusty_Golbat.Setup
 {
     public class LineBox
     {
@@ -26,50 +26,50 @@ namespace Gusty_Golbat
             this.scale = scale;
             this.color = color;
 
-            this.CreateMatrix();
-            this.CreateVertex();
-            this.CreateVBuffer();
-            this.CreateIndexes();
-            this.CreateIBuffer();
+            CreateMatrix();
+            CreateVertex();
+            CreateVBuffer();
+            CreateIndexes();
+            CreateIBuffer();
         }
 
         private void CreateMatrix()
         {
-            this.world = Matrix.Identity;
-            this.world *= Matrix.CreateScale(this.scale);
-            this.world *= Matrix.CreateTranslation(this.position);
+            world = Matrix.Identity;
+            world *= Matrix.CreateScale(scale);
+            world *= Matrix.CreateTranslation(position);
         }
 
         private void CreateVertex()
         {
             float v = 0.5f;
 
-            this.verts = new VertexPositionColor[]
+            verts = new VertexPositionColor[]
             {
-                new VertexPositionColor(new Vector3(-v, v,-v), this.color),//0
-                new VertexPositionColor(new Vector3( v, v,-v), this.color),//1
-                new VertexPositionColor(new Vector3(-v, v, v), this.color),//2
-                new VertexPositionColor(new Vector3( v, v, v), this.color),//3
+                new VertexPositionColor(new Vector3(-v, v,-v), color),//0
+                new VertexPositionColor(new Vector3( v, v,-v), color),//1
+                new VertexPositionColor(new Vector3(-v, v, v), color),//2
+                new VertexPositionColor(new Vector3( v, v, v), color),//3
 
-                new VertexPositionColor(new Vector3(-v,-v,-v), this.color),//4
-                new VertexPositionColor(new Vector3( v,-v,-v), this.color),//5
-                new VertexPositionColor(new Vector3(-v,-v, v), this.color),//6
-                new VertexPositionColor(new Vector3( v,-v, v), this.color),//7
+                new VertexPositionColor(new Vector3(-v,-v,-v), color),//4
+                new VertexPositionColor(new Vector3( v,-v,-v), color),//5
+                new VertexPositionColor(new Vector3(-v,-v, v), color),//6
+                new VertexPositionColor(new Vector3( v,-v, v), color),//7
             };
         }
 
         private void CreateVBuffer()
         {
-            this.vBuffer = new VertexBuffer(this.game.GraphicsDevice,
+            vBuffer = new VertexBuffer(game.GraphicsDevice,
                                             typeof(VertexPositionColor),
-                                            this.verts.Length,
+                                            verts.Length,
                                             BufferUsage.None);
-            this.vBuffer.SetData<VertexPositionColor>(this.verts);
+            vBuffer.SetData(verts);
         }
 
         private void CreateIndexes()
         {
-            this.indexes = new short[]
+            indexes = new short[]
             {
                 // cima
                 0, 1,
@@ -93,33 +93,32 @@ namespace Gusty_Golbat
 
         private void CreateIBuffer()
         {
-            this.iBuffer = new IndexBuffer(this.game.GraphicsDevice,
+            iBuffer = new IndexBuffer(game.GraphicsDevice,
                                            IndexElementSize.SixteenBits,
-                                           this.indexes.Length,
+                                           indexes.Length,
                                            BufferUsage.None);
-            this.iBuffer.SetData<short>(this.indexes);
+            iBuffer.SetData(indexes);
         }
 
         public void Draw(BasicEffect e)
         {
-            e.World = this.world;
+            e.World = world;
             e.VertexColorEnabled = true;
 
-            this.game.GraphicsDevice.SetVertexBuffer(this.vBuffer);
-            this.game.GraphicsDevice.Indices = this.iBuffer;
+            game.GraphicsDevice.SetVertexBuffer(vBuffer);
+            game.GraphicsDevice.Indices = iBuffer;
 
             foreach (EffectPass pass in e.CurrentTechnique.Passes)
             {
                 pass.Apply();
 
-                this.game.GraphicsDevice.DrawUserIndexedPrimitives
-                    <VertexPositionColor>(PrimitiveType.LineList,
-                                          this.verts,
+                game.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.LineList,
+                                          verts,
                                           0,
-                                          this.verts.Length,
-                                          this.indexes,
+                                          verts.Length,
+                                          indexes,
                                           0,
-                                          this.indexes.Length / 2);
+                                          indexes.Length / 2);
             }
             e.VertexColorEnabled = false;
         }
@@ -127,22 +126,22 @@ namespace Gusty_Golbat
         public void SetPosition(Vector3 position)
         {
             this.position = position;
-            this.CreateMatrix();
+            CreateMatrix();
         }
 
         public void SetScale(Vector3 scale)
         {
             this.scale = scale;
-            this.CreateMatrix();
+            CreateMatrix();
         }
 
         public void SetColor(Color color)
         {
             this.color = color;
 
-            for (int i = 0; i < this.verts.Length; i++)
+            for (int i = 0; i < verts.Length; i++)
             {
-                this.verts[i].Color = this.color;
+                verts[i].Color = this.color;
             }
         }
     }

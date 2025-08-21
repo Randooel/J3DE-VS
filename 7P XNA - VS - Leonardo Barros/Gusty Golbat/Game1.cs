@@ -1,4 +1,6 @@
-﻿using Gusty_Golbat.Content;
+﻿using Gusty_Golbat.Entidades;
+using Gusty_Golbat.Geometria;
+using Gusty_Golbat.Setup;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,18 +13,23 @@ namespace Gusty_Golbat
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        // SETUP
         private Camera _camera;
-        private BasicEffect _effect;
+        public BasicEffect effect;
 
+        // PERSONAGENS
         private Collider[] _collider;
         private Golbat[] _golbats;
 
+        // CENÁRIO
         private PlaneDrawer _plane;
         private Texture2D _backgroundTexture;
         private Texture2D _golbatTexture;
 
-        private List<Coracao> _coracoes;
-        private int _coracaoCount = 0;
+        //ITENS
+        private List<Heart> _hearts;
+        private int _heartCount = 0;
+        private Texture2D _heartTexture;
 
         public Game1()
         {
@@ -51,22 +58,22 @@ namespace Gusty_Golbat
                 new Collider(this, new Vector3(0,2,6), new Vector3(6,4,0.5f), Color.Green)
             };
 
-            _coracoes = new List<Coracao>
+            _hearts = new List<Heart>
             {
-                new Coracao(this, new Vector3(30f,0f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,2f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,3f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,-3f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,-2f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,-1f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,1f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,0f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,2f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,3f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,-3f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,-2f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,-1f,-8f), Vector3.One, Color.Red),
-                new Coracao(this, new Vector3(30f,1f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,0f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,2f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,3f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,-3f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,-2f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,-1f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,1f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,0f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,2f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,3f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,-3f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,-2f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,-1f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(30f,1f,-8f), Vector3.One, Color.Red),
             };
 
             _plane = new PlaneDrawer(GraphicsDevice);
@@ -78,10 +85,21 @@ namespace Gusty_Golbat
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _effect = new BasicEffect(GraphicsDevice) { TextureEnabled = true };
+            effect = new BasicEffect(GraphicsDevice) { TextureEnabled = true };
 
             _backgroundTexture = Content.Load<Texture2D>("Background");
             _golbatTexture = Content.Load<Texture2D>("Golbat");
+            _heartTexture = Content.Load<Texture2D>("Heart");
+
+            foreach (var golbat in _golbats)
+            {
+                golbat.texture = _golbatTexture;
+            }
+
+            foreach(var heart in _hearts)
+            {
+                heart.texture = _heartTexture;
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -94,16 +112,16 @@ namespace Gusty_Golbat
             foreach (var golbat in _golbats)
                 golbat.Update(gameTime);
 
-            for (int i = _coracoes.Count - 1; i >= 0; i--)
+            for (int i = _hearts.Count - 1; i >= 0; i--)
             {
-                var coracao = _coracoes[i];
-                coracao.Update(gameTime);
+                var heart = _hearts[i];
+                heart.Update(gameTime);
 
-                if (coracao.IsColliding(_golbats[0].GetBoundingBox()))
+                if (heart.IsColliding(_golbats[0].GetBoundingBox()))
                 {
-                    _coracaoCount++;
-                    Window.Title = _coracaoCount.ToString();
-                    _coracoes.RemoveAt(i);
+                    _heartCount++;
+                    Window.Title = _heartCount.ToString();
+                    _hearts.RemoveAt(i);
                 }
             }
 
@@ -112,12 +130,12 @@ namespace Gusty_Golbat
                 if (c.IsColliding(_golbats[0].GetBoundingBox()))
                 {
                     Window.Title = "Colidiu";
-                    c.GetLineBox().SetColor(Microsoft.Xna.Framework.Color.Red);
+                    c.GetLineBox().SetColor(Color.Red);
                     _golbats[0].RestorePosition();
                 }
                 else
                 {
-                    c.GetLineBox().SetColor(Microsoft.Xna.Framework.Color.Green);
+                    c.GetLineBox().SetColor(Color.Green);
                 }
             }
 
@@ -126,18 +144,20 @@ namespace Gusty_Golbat
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
+            GraphicsDevice.Clear(Color.Black);
 
-            _effect.View = _camera.GetView();
-            _effect.Projection = _camera.GetProjection();
+            effect.View = _camera.GetView();
+            effect.Projection = _camera.GetProjection();
 
             foreach (var golbat in _golbats)
                 golbat.Draw(_camera);
 
-            foreach (var coracao in _coracoes)
-                coracao.Draw(_camera);
+            foreach(var heart in _hearts)
+            {
+                heart.Draw(_camera, effect);
+            }
 
-            _plane.Draw(_effect, _backgroundTexture);
+            _plane.Draw(effect, _backgroundTexture);
 
             base.Draw(gameTime);
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusty_Golbat
+namespace Gusty_Golbat.Entidades
 {
     internal class Magnemite
     {
