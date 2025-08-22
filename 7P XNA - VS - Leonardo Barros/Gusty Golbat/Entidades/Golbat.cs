@@ -37,7 +37,7 @@ namespace Gusty_Golbat.Entidades
             Damaged
         }
 
-        public Golbat(Game game, Vector3 position, Vector3 rot, Vector3 sca, float speed, Texture2D texture, Vector3 dimension, Color color, bool visible = true)
+        public Golbat(Game game, Vector3 position, Vector3 rot, Vector3 sca, float speed, Texture2D texture, Vector3 dimension, Color color, bool visible = false)
             : base(game, position, dimension, color, visible)
         {
             this.game = game;
@@ -81,8 +81,8 @@ namespace Gusty_Golbat.Entidades
             };
 
             wingScale = new Vector3(0.2f, 0.1f, 0.1f);
-            wingRotation = new Vector3(90f, 90f, 90f);
-            wingRotation = new Vector3(3f, 0f, 0f);
+            wingRotation = new Vector3(90f, 0f, 0f);
+            wingPosition = new Vector3(0f, 0f, 0f);
 
             // Left Wing
             wings[0].SetPlaneInitialTransform(wingPosition, wingRotation, wingScale);
@@ -218,8 +218,6 @@ namespace Gusty_Golbat.Entidades
                     position.X += moveSpeed * deltaTime;
                 }
             }
-            
-            
 
             world = Matrix.CreateScale(scale)
             * Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X))

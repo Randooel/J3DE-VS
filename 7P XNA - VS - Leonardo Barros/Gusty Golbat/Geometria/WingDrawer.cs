@@ -77,11 +77,7 @@ namespace Gusty_Golbat.Geometria
         {
             this.rotation.Y += gameTime.ElapsedGameTime.Milliseconds * 0.001f;
 
-            this.world = Matrix.Identity;
-            this.world *= Matrix.CreateScale(this.scale);
-            this.world *= Matrix.CreateRotationY(this.rotation.Y);
-            this.world *= Matrix.CreateTranslation(this.position);
-            this.world *= _base;
+            this.world *= Matrix.CreateScale(this.scale) * Matrix.CreateRotationY(this.rotation.Y) * Matrix.CreateTranslation(this.position) * _base;
         }
 
         public void Draw(BasicEffect effect, Texture2D texture)

@@ -86,6 +86,7 @@ namespace Gusty_Golbat.Setup
 
         private void Rotation(GameTime gameTime)
         {
+            /*
             if (Keyboard.GetState().IsKeyDown(Keys.Q))
             {
                 angleY += speedY * gameTime.ElapsedGameTime.Milliseconds * 0.001f;
@@ -94,7 +95,7 @@ namespace Gusty_Golbat.Setup
             {
                 angleY -= speedY * gameTime.ElapsedGameTime.Milliseconds * 0.001f;
             }
-            /*
+            
             if (Keyboard.GetState().IsKeyDown(Keys.R))
             {
                 // Como quero que rotacione na mesma velocidade que o eixo Y, reaproveitei a variável speedY
