@@ -23,11 +23,11 @@ namespace Gusty_Golbat
         // PERSONAGENS
         private Collider[] _collider;
         private Golbat[] _golbats;
+        private Magnemite[] _magnemites;
 
         // CENÁRIO
         private PlaneDrawer _plane;
-        private Texture2D _backgroundTexture;
-        private Texture2D _golbatTexture;
+        private Texture2D _backgroundTexture, _golbatTexture, _magnemiteTexture;
 
         //ITENS
         private List<Heart> _hearts;
@@ -46,13 +46,25 @@ namespace Gusty_Golbat
 
         protected override void Initialize()
         {
+            // SETUP
             _camera = new Camera();
             _camera.SetupView(new Vector3(-5.5f, 0f, 10f), Vector3.Zero, Vector3.Up);
 
+            // PERSONAGENS
             _golbats = new Golbat[]
             {
-                new Golbat(this, new Vector3(-15f,0f,-8f), Vector3.Zero, new Vector3(1f,1.5f,0.5f), 5, _golbatTexture, Vector3.One, Color.Green),
+                new Golbat(this, new Vector3(-15f,0f,-8f), Vector3.Zero, new Vector3(1f,1.5f,0.5f), 10, _golbatTexture, Vector3.One, Color.Green),
                 //new Golbat(this, new Vector3(8f,0f,-8f), Vector3.Zero, new Vector3(1f,1.5f,0.5f), 0, _golbatTexture, Vector3.One, Color.Green)
+            };
+
+            _magnemites = new Magnemite[]
+            {
+                new Magnemite(this, new Vector3(30f,0f,-8f), Vector3.One, Color.Red),
+                new Magnemite(this, new Vector3(30f,2f,-8f), Vector3.One, Color.Red),
+                new Magnemite(this, new Vector3(30f,3f,-8f), Vector3.One, Color.Red),
+                new Magnemite(this, new Vector3(30f,-3f,-8f), Vector3.One, Color.Red),
+                new Magnemite(this, new Vector3(30f,-2f,-8f), Vector3.One, Color.Red),
+                new Magnemite(this, new Vector3(30f,-1f,-8f), Vector3.One, Color.Red),
             };
 
             _collider = new Collider[]
@@ -61,9 +73,10 @@ namespace Gusty_Golbat
                 new Collider(this, new Vector3(0,2,6), new Vector3(6,4,0.5f), Color.Green)
             };
 
+            // ITENS
             _hearts = new List<Heart>
             {
-                new Heart(this, new Vector3(30f,0f,-8f), Vector3.One, Color.Red),
+                new Heart(this, new Vector3(10f,0f,-8f), Vector3.One, Color.Red),
                 new Heart(this, new Vector3(30f,2f,-8f), Vector3.One, Color.Red),
                 new Heart(this, new Vector3(30f,3f,-8f), Vector3.One, Color.Red),
                 new Heart(this, new Vector3(30f,-3f,-8f), Vector3.One, Color.Red),
@@ -79,6 +92,7 @@ namespace Gusty_Golbat
                 new Heart(this, new Vector3(30f,1f,-8f), Vector3.One, Color.Red),
             };
 
+            // CENÁRIO
             _plane = new PlaneDrawer(GraphicsDevice);
             _plane.SetPlaneInitialTransform(new Vector3(0f, 0f, -10f), new Vector3(90f, 0f, 0f), new Vector3(2f, 0f, 0.7f));
 
@@ -98,15 +112,21 @@ namespace Gusty_Golbat
             _backgroundTexture = Content.Load<Texture2D>("Background");
             _golbatTexture = Content.Load<Texture2D>("Golbat");
             _heartTexture = Content.Load<Texture2D>("Heart");
+            _magnemiteTexture = Content.Load<Texture2D>("Magnemite");
 
             foreach (var golbat in _golbats)
             {
                 golbat.texture = _golbatTexture;
             }
 
-            foreach(var heart in _hearts)
+            foreach (var heart in _hearts)
             {
                 heart.texture = _heartTexture;
+            }
+
+            foreach (var magnemite in _magnemites)
+            {
+                magnemite.texture = _magnemiteTexture;
             }
         }
 
@@ -118,7 +138,33 @@ namespace Gusty_Golbat
             _camera.Update(gameTime);
 
             foreach (var golbat in _golbats)
+            {
                 golbat.Update(gameTime);
+            }
+
+            for (int i = _magnemites.Length - 1; i >= 0; i--)
+            {
+                var magnemite = _magnemites[i];
+                magnemite.Update(gameTime);
+
+                if (_golbats[0].currentState != Golbat.State.Damaged)
+                {
+                    if (magnemite.IsColliding(_golbats[0].GetBoundingBox()))
+                    {
+                        if(_heartCount > 0)
+                        {
+                            _heartCount--;
+                        }
+
+                        _golbats[0].SwitchState(Golbat.State.Damaged);
+                        _golbats[0].RestorePosition();
+
+                        // Debug
+                        Window.Title = _golbats[0].currentState.ToString();
+                    }
+                }
+            }
+
 
             for (int i = _hearts.Count - 1; i >= 0; i--)
             {
@@ -128,7 +174,7 @@ namespace Gusty_Golbat
                 if (heart.IsColliding(_golbats[0].GetBoundingBox()))
                 {
                     _heartCount++;
-                    Window.Title = _heartCount.ToString();
+                    //Window.Title = _heartCount.ToString();
                     _hearts.RemoveAt(i);
                 }
             }
@@ -160,7 +206,16 @@ namespace Gusty_Golbat
 
             // ENTIDADES
             foreach (var golbat in _golbats)
+            {
                 golbat.Draw(_camera);
+            }
+
+            GraphicsDevice.BlendState = BlendState.AlphaBlend;
+
+            foreach (var magnemite in _magnemites)
+            {
+                magnemite.Draw(_camera, effect);
+            }
 
             foreach (var heart in _hearts)
             {

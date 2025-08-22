@@ -22,7 +22,7 @@ namespace Gusty_Golbat.Entidades
         CubeDrawer[] cubes;
         public Texture2D texture;
 
-        State currentState;
+        public State currentState;
         public enum State
         {
             Idle,
@@ -68,18 +68,7 @@ namespace Gusty_Golbat.Entidades
 
         public void Update(GameTime gameTime)
         {
-            switch (currentState)
-            {
-                case State.Idle:
-                    HandleIdle();
-                    break;
-                case State.Flying:
-                    HandleFly();
-                    break;
-                case State.Damaged:
-                    HandleDamage();
-                    break;
-            }
+            
 
             Translation(gameTime);
 
@@ -103,6 +92,24 @@ namespace Gusty_Golbat.Entidades
         }
 
         // FUNÇÕES DE ESTADOS
+
+        public void SwitchState(State nextState)
+        {
+            currentState = nextState;
+
+            switch (currentState)
+            {
+                case State.Idle:
+                    HandleIdle();
+                    break;
+                case State.Flying:
+                    HandleFly();
+                    break;
+                case State.Damaged:
+                    HandleDamage();
+                    break;
+            }
+        }
         private void HandleIdle()
         {
 
