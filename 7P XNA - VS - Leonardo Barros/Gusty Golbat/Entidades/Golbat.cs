@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using Gusty_Golbat.Geometria;
 using Gusty_Golbat.Setup;
@@ -80,13 +81,15 @@ namespace Gusty_Golbat.Entidades
                 new WingDrawer(game.GraphicsDevice),
             };
 
-            wingScale = new Vector3(0.2f, 0.1f, 0.1f);
+            wingScale = new Vector3(0.2f, 0.2f, 0.5f);
             wingRotation = new Vector3(90f, 0f, 0f);
             wingPosition = new Vector3(0f, 0f, 0f);
 
             // Left Wing
-            wings[0].SetPlaneInitialTransform(wingPosition, wingRotation, wingScale);
+            
+
             // Right Wing
+            // wings[0].SetPlaneInitialTransform(wingPosition, wingRotation, wingScale);
             //wings[1].SetPlaneInitialTransform(new Vector3(0f, 0f, 0f), new Vector3(0f, 0f, 0f), new Vector3(0.2f, 0.1f, 0.1f));
 
         }
@@ -98,6 +101,7 @@ namespace Gusty_Golbat.Entidades
             foreach (var wing in wings)
             {
                 wing.Update(gameTime, this.world);
+                
             }
 
             Translation(gameTime);
@@ -122,12 +126,21 @@ namespace Gusty_Golbat.Entidades
                     SwitchState(State.Idle);
                 }
             }
+            else
+            {
+                foreach (var wing in wings)
+                {
+                    wing.world = Matrix.CreateScale(this.wingScale) * Matrix.CreateRotationZ(damagedRotation) * Matrix.CreateTranslation(this.position);
+                }
+            }
 
+            /*
             // WINGS DEBUG
             if (Keyboard.GetState().IsKeyDown(Keys.Up))
             {
                 wingPosition.X += 1 * deltaTime;
             }
+            */
         }
 
         public void Draw(Camera camera)
@@ -177,12 +190,12 @@ namespace Gusty_Golbat.Entidades
 
         private void HandleFly()
         {
-
+            // Nesse Update
         }
 
         private void HandleDamage()
         {
-
+            // Nesse Update e do Game1
 
             /*
             currentState = State.Idle;
