@@ -13,6 +13,9 @@ namespace Gusty_Golbat
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        // INTERFACE
+        private SpriteFont _font;
+
         // SETUP
         private Camera _camera;
         public BasicEffect effect;
@@ -84,9 +87,14 @@ namespace Gusty_Golbat
 
         protected override void LoadContent()
         {
+            // SETUP
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             effect = new BasicEffect(GraphicsDevice) { TextureEnabled = true };
 
+            // INTERFACE
+            _font = Content.Load<SpriteFont>("galleryFont");
+
+            // TEXTURES
             _backgroundTexture = Content.Load<Texture2D>("Background");
             _golbatTexture = Content.Load<Texture2D>("Golbat");
             _heartTexture = Content.Load<Texture2D>("Heart");
@@ -144,20 +152,33 @@ namespace Gusty_Golbat
 
         protected override void Draw(GameTime gameTime)
         {
+            // SETUP
             GraphicsDevice.Clear(Color.Black);
 
             effect.View = _camera.GetView();
             effect.Projection = _camera.GetProjection();
 
+            // ENTIDADES
             foreach (var golbat in _golbats)
                 golbat.Draw(_camera);
 
-            foreach(var heart in _hearts)
+            foreach (var heart in _hearts)
             {
                 heart.Draw(_camera, effect);
             }
 
+            // CENÁRIO
             _plane.Draw(effect, _backgroundTexture);
+
+            // INTERFACE
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(_font, "1P: " + _heartCount.ToString(), new Vector2(100, 10), Color.Blue);
+            _spriteBatch.End();
+
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
             base.Draw(gameTime);
         }
