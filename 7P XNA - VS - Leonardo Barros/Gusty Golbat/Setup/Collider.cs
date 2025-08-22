@@ -9,7 +9,7 @@ namespace Gusty_Golbat.Setup
 {
     public class Collider
     {
-        protected Vector3 position, dimension;
+        public Vector3 position, dimension;
         BoundingBox bb;
         protected LineBox lineBox;
         bool visible;

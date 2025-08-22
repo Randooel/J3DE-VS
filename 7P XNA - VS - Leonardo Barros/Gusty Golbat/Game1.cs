@@ -135,7 +135,12 @@ namespace Gusty_Golbat
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            // SETUP
             _camera.Update(gameTime);
+
+            // PERSONAGENS
+            // Debug
+            Window.Title = _golbats[0].currentState.ToString();
 
             foreach (var golbat in _golbats)
             {
@@ -157,10 +162,7 @@ namespace Gusty_Golbat
                         }
 
                         _golbats[0].SwitchState(Golbat.State.Damaged);
-                        _golbats[0].RestorePosition();
-
-                        // Debug
-                        Window.Title = _golbats[0].currentState.ToString();
+                        //_golbats[0].RestorePosition();
                     }
                 }
             }

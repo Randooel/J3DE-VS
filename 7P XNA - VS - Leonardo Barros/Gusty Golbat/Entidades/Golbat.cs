@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,13 @@ namespace Gusty_Golbat.Entidades
 
         // Substituir para uma geometria do Golbat, se der tempo
         CubeDrawer[] cubes;
+        WingDrawer[] wings;
         public Texture2D texture;
+        public Texture2D wingTexture;
+
+        private float damagedTime = 1f, damagedRotation = 0f;
+
+        Vector3 wingPosition, wingRotation, wingScale;
 
         public State currentState;
         public enum State
@@ -60,18 +67,67 @@ namespace Gusty_Golbat.Entidades
         {
             currentState = State.Idle;
 
+            // Body
             cubes = new CubeDrawer[]
             {
                 new CubeDrawer(game, new Vector3(0f, 0f, 0f), Vector3.Zero, new Vector3(1f,1f,1f), world, texture)
             };
+
+            // Wings
+            wings = new WingDrawer[]
+            {
+                new WingDrawer(game.GraphicsDevice),
+                new WingDrawer(game.GraphicsDevice),
+            };
+
+            wingScale = new Vector3(0.2f, 0.1f, 0.1f);
+            wingRotation = new Vector3(90f, 90f, 90f);
+            wingRotation = new Vector3(3f, 0f, 0f);
+
+            // Left Wing
+            wings[0].SetPlaneInitialTransform(wingPosition, wingRotation, wingScale);
+            // Right Wing
+            //wings[1].SetPlaneInitialTransform(new Vector3(0f, 0f, 0f), new Vector3(0f, 0f, 0f), new Vector3(0.2f, 0.1f, 0.1f));
+
         }
 
         public void Update(GameTime gameTime)
         {
-            
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            foreach (var wing in wings)
+            {
+                wing.Update(gameTime, this.world);
+            }
 
             Translation(gameTime);
 
+            if (currentState == State.Damaged)
+            {
+                if (damagedTime > 0f)
+                {
+                    damagedTime -= deltaTime;
+                    damagedRotation += 10f * deltaTime;
+
+                    cubes[0].world = Matrix.CreateRotationZ(damagedRotation) * Matrix.CreateTranslation(this.position);
+                    foreach(var wing in wings)
+                    {
+                        wing.world = Matrix.CreateScale(this.wingScale) * Matrix.CreateRotationZ(damagedRotation) * Matrix.CreateTranslation(this.position);
+                    }
+                }
+                else
+                {
+                    damagedTime = 1f;
+                    damagedRotation = 0f;
+                    SwitchState(State.Idle);
+                }
+            }
+
+            // WINGS DEBUG
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                wingPosition.X += 1 * deltaTime;
+            }
         }
 
         public void Draw(Camera camera)
@@ -88,11 +144,15 @@ namespace Gusty_Golbat.Entidades
                 VertexColorEnabled = true
             };
 
+            foreach (var plane in wings)
+            {
+                plane.Draw(effect, wingTexture);
+            }
+
             Draw(effect);
         }
 
         // FUNÇÕES DE ESTADOS
-
         public void SwitchState(State nextState)
         {
             currentState = nextState;
@@ -123,6 +183,11 @@ namespace Gusty_Golbat.Entidades
         private void HandleDamage()
         {
 
+
+            /*
+            currentState = State.Idle;
+            SwitchState(currentState);
+            */
         }
 
         // FUNÇÕES DE AÇÃO
@@ -132,22 +197,29 @@ namespace Gusty_Golbat.Entidades
 
             oldPosition = position;
 
-            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            if (currentState != State.Damaged)
             {
-                position.Y += moveSpeed * deltaTime;
+                currentState = State.Flying;
+
+                if (Keyboard.GetState().IsKeyDown(Keys.W))
+                {
+                    position.Y += moveSpeed * deltaTime;
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.S))
+                {
+                    position.Y -= moveSpeed * deltaTime;
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.A))
+                {
+                    position.X -= moveSpeed * deltaTime;
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.D))
+                {
+                    position.X += moveSpeed * deltaTime;
+                }
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.S))
-            {
-                position.Y -= moveSpeed * deltaTime;
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.A))
-            {
-                position.X -= moveSpeed * deltaTime;
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.D))
-            {
-                position.X += moveSpeed * deltaTime;
-            }
+            
+            
 
             world = Matrix.CreateScale(scale)
             * Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X))

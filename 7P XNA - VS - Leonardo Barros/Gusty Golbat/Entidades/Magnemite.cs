@@ -25,7 +25,7 @@ namespace Gusty_Golbat.Entidades
             this.position = position;
             this.rotation = new Vector3(256f, 0f, 0f);
             this.scale = new Vector3(0.1f, 0.1f, 0.1f);
-            moveSpeed = new Random().Next(1, 15);
+            moveSpeed = new Random().Next(5, 15);
 
             world = Matrix.Identity;
             world *= Matrix.CreateScale(this.scale);
