@@ -2,6 +2,7 @@
 using Gusty_Golbat.Setup;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Net.Mime;
 
@@ -21,8 +22,8 @@ namespace Gusty_Golbat.Entidades
         {
             this.game = game;
             this.position = position;
-            this.rotation = new Vector3(90f, 0f, 0f);
-            this.scale = new Vector3(0.5f, 0.5f, 0.3f);
+            this.rotation = new Vector3(174.4f, 0f, 0f);
+            this.scale = new Vector3(0.1f, 0.1f, 0.1f);
             moveSpeed = new Random().Next(1, 15);
 
             world = Matrix.Identity;
@@ -43,21 +44,32 @@ namespace Gusty_Golbat.Entidades
 
         public void Update(GameTime gameTime)
         {
-            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             var maxScale = new Vector3(1f, 1f, 1f);
 
-            position.X -= moveSpeed * delta * 0.5f;
+            position.X -= moveSpeed * deltaTime * 0.5f;
 
             SetPosition(this.position);
 
             world = Matrix.CreateScale(this.scale) * Matrix.CreateRotationX(this.rotation.X) * Matrix.CreateTranslation(this.position);
 
-            if(this.scale <= maxScale)
-            {
-                this.scale++;
-            }
-
             _plane.SetWorld(world);
+
+            // DEBUG DE ROTAÇÃO DO CORAÇÃO
+            /*
+            var rotationSpeed = 1f;
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                this.rotation.X += rotationSpeed * deltaTime;
+                game.Window.Title = this.rotation.X.ToString();
+            }
+            if(Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                this.rotation.X -= rotationSpeed * deltaTime;
+                game.Window.Title = this.rotation.X.ToString();
+            }
+            */
         }
 
         public void Draw(Camera camera, BasicEffect effect)
